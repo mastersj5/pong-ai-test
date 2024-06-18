@@ -2,13 +2,51 @@ const canvas = document.getElementById('pongCanvas');
 const context = canvas.getContext('2d');
 
 // Set initial canvas size
-canvas.width = document.documentElement.clientWidth;
-canvas.height = document.documentElement.clientHeight;
+let initialWidth = document.documentElement.clientWidth;
+let initialHeight = document.documentElement.clientHeight;
+canvas.width = initialWidth;
+canvas.height = initialHeight;
+
+let paddleWidth = 20, paddleHeight = 130;
+let scoreFontSize = 60;
+
+let leftPaddle = {
+    x: 0,
+    y: canvas.height / 2 - paddleHeight / 2,
+    width: paddleWidth,
+    height: paddleHeight,
+    dy: 2.5
+};
+
+let rightPaddle = {
+    x: canvas.width - paddleWidth,
+    y: canvas.height / 2 - paddleHeight / 2,
+    width: paddleWidth,
+    height: paddleHeight,
+    dy: 2.5
+};
+
+let ballRadius = 15;
+let ballSpeed = 2.5;
+
+let ball = {
+    x: canvas.width / 2,
+    y: canvas.height / 2,
+    radius: ballRadius,
+    speed: ballSpeed,
+    dx: ballSpeed,
+    dy: ballSpeed
+};
 
 // Resize the canvas to fill browser window dynamically
 window.addEventListener('resize', () => {
-    canvas.width = document.documentElement.clientWidth;
-    canvas.height = document.documentElement.clientHeight;
+    let newWidth = document.documentElement.clientWidth;
+    let newHeight = document.documentElement.clientHeight;
+    let widthRatio = newWidth / initialWidth;
+    let heightRatio = newHeight / initialHeight;
+
+    canvas.width = newWidth;
+    canvas.height = newHeight;
 
     // Update ball position to be within canvas
     ball.x = Math.min(ball.x, canvas.width - ball.radius);
@@ -16,16 +54,37 @@ window.addEventListener('resize', () => {
 
     // Update right paddle position to be within canvas
     rightPaddle.x = canvas.width - rightPaddle.width - 10; // 10 is the margin from the right edge
-});
+    rightPaddle.y = canvas.height / 2 - rightPaddle.height / 2; // Update to the center
 
-const ball = {
-    x: canvas.width / 2,
-    y: canvas.height / 2,
-    radius: 10,
-    speed: 2,
-    dx: 2,
-    dy: 2
-};
+    // Update left paddle position to be within canvas
+    leftPaddle.y = canvas.height / 2 - leftPaddle.height / 2; // Update to the center
+
+    // Update paddle size and speed
+    paddleWidth *= widthRatio;
+    paddleHeight *= heightRatio;
+    leftPaddle.width = paddleWidth;
+    leftPaddle.height = paddleHeight;
+    rightPaddle.width = paddleWidth;
+    rightPaddle.height = paddleHeight;
+    leftPaddle.dy *= heightRatio;
+    rightPaddle.dy *= heightRatio;
+
+    // Update ball size and speed
+    ballRadius *= Math.min(widthRatio, heightRatio);
+    ballSpeed *= Math.min(widthRatio, heightRatio);
+    ball.radius = ballRadius;
+    ball.dx = ballSpeed;
+    ball.dy = ballSpeed;
+
+    // Update score font size
+    scoreFontSize = 60 * Math.min(widthRatio, heightRatio);
+    context.font = `${scoreFontSize}px Arial`;
+
+    // Update initial size for next resize
+    initialWidth = newWidth;
+    initialHeight = newHeight;
+    
+});
 
 function drawBall() {
     context.beginPath();
@@ -78,23 +137,6 @@ function updateBall() {
     }
 }
 
-const paddleWidth = 15, paddleHeight = 80;
-
-let leftPaddle = {
-    x: 0,
-    y: canvas.height / 2 - paddleHeight / 2,
-    width: paddleWidth,
-    height: paddleHeight,
-    dy: 2
-};
-
-let rightPaddle = {
-    x: canvas.width - paddleWidth,
-    y: canvas.height / 2 - paddleHeight / 2,
-    width: paddleWidth,
-    height: paddleHeight,
-    dy: 2
-};
 
 function drawPaddle(x, y, width, height, color) {
     context.fillStyle = color;
@@ -142,17 +184,26 @@ window.addEventListener('keyup', function(event) {
 });
 
 function collisionDetect(paddle, ball) {
-    return ball.x < paddle.x + paddle.width &&
-           ball.x + ball.radius > paddle.x &&
-           ball.y < paddle.y + paddle.height &&
-           ball.y + ball.radius > paddle.y;
+    let paddleMid = paddle.y + paddle.height / 2;
+    let dist = ball.y - paddleMid;
+
+    if (ball.x < paddle.x + paddle.width &&
+        ball.x + ball.radius > paddle.x &&
+        ball.y < paddle.y + paddle.height &&
+        ball.y + ball.radius > paddle.y) {
+        
+        // Change direction of ball depending on where it hit the paddle
+        ball.dy = dist * 0.05;
+        return true;
+    }
+    return false;
 }
 
 let leftScore = 0;
 let rightScore = 0;
 
 function drawScore() {
-    context.font = '35px Arial';
+    context.font = `${scoreFontSize}px Arial`;
     context.fillStyle = 'white'; // change color to white
     context.fillText(leftScore, canvas.width / 4, canvas.height / 5);
     context.fillText(rightScore, 3 * canvas.width / 4, canvas.height / 5);

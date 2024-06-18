@@ -21,8 +21,8 @@
     <script>
         const canvas = document.getElementById('pongCanvas');
         function resizeCanvas() {
-            canvas.width = document.documentElement.clientWidth;
-            canvas.height = document.documentElement.clientHeight;
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         }
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas(); // initial resize
