@@ -7,6 +7,9 @@ let initialHeight = document.documentElement.clientHeight;
 canvas.width = initialWidth;
 canvas.height = initialHeight;
 
+// Store initial paddle dimensions
+let initialPaddleWidth = 20, initialPaddleHeight = 130;
+
 let paddleWidth = 20, paddleHeight = 130;
 let scoreFontSize = 60;
 
@@ -19,7 +22,7 @@ let leftPaddle = {
 };
 
 let rightPaddle = {
-    x: canvas.width - paddleWidth,
+    x: canvas.width - paddleWidth - 5,
     y: canvas.height / 2 - paddleHeight / 2,
     width: paddleWidth,
     height: paddleHeight,
@@ -38,6 +41,8 @@ let ball = {
     dy: ballSpeed
 };
 
+let lastScoredSide = 'right'; // Initialize to 'right' so the ball initially goes to the left
+
 // Resize the canvas to fill browser window dynamically
 window.addEventListener('resize', () => {
     let newWidth = document.documentElement.clientWidth;
@@ -45,45 +50,33 @@ window.addEventListener('resize', () => {
     let widthRatio = newWidth / initialWidth;
     let heightRatio = newHeight / initialHeight;
 
+    initialWidth = newWidth;
+    initialHeight = newHeight;
+
     canvas.width = newWidth;
     canvas.height = newHeight;
 
-    // Update ball position to be within canvas
-    ball.x = Math.min(ball.x, canvas.width - ball.radius);
-    ball.y = Math.min(ball.y, canvas.height - ball.radius);
+    // Update ball and paddle positions
+    [ball, leftPaddle, rightPaddle].forEach(obj => {
+        obj.x *= widthRatio;
+        obj.y *= heightRatio;
+    });
 
-    // Update right paddle position to be within canvas
-    rightPaddle.x = canvas.width - rightPaddle.width - 10; // 10 is the margin from the right edge
-    rightPaddle.y = canvas.height / 2 - rightPaddle.height / 2; // Update to the center
+    // Update ball size and speed with limits
+    ball.radius = Math.min(Math.max(ball.radius * Math.sqrt(widthRatio), 10), 30);
+    ball.dx = Math.min(Math.max(ball.dx * widthRatio, 1), 5);
+    ball.dy = Math.min(Math.max(ball.dy * heightRatio, 1), 5);
 
-    // Update left paddle position to be within canvas
-    leftPaddle.y = canvas.height / 2 - leftPaddle.height / 2; // Update to the center
+    // Update paddle size and speed with limits
+    [leftPaddle, rightPaddle].forEach(paddle => {
+        paddle.width = Math.min(Math.max(paddle.width * widthRatio, 10), 40);
+        paddle.height = Math.min(Math.max(paddle.height * heightRatio, 65), 260);
+        paddle.dy = Math.min(Math.max(paddle.dy * Math.sqrt(heightRatio), 1), 5);
+    });
 
-    // Update paddle size and speed
-    paddleWidth *= widthRatio;
-    paddleHeight *= heightRatio;
-    leftPaddle.width = paddleWidth;
-    leftPaddle.height = paddleHeight;
-    rightPaddle.width = paddleWidth;
-    rightPaddle.height = paddleHeight;
-    leftPaddle.dy *= heightRatio;
-    rightPaddle.dy *= heightRatio;
-
-    // Update ball size and speed
-    ballRadius *= Math.min(widthRatio, heightRatio);
-    ballSpeed *= Math.min(widthRatio, heightRatio);
-    ball.radius = ballRadius;
-    ball.dx = ballSpeed;
-    ball.dy = ballSpeed;
-
-    // Update score font size
-    scoreFontSize = 60 * Math.min(widthRatio, heightRatio);
+    // Update score font size with limits
+    scoreFontSize = Math.min(Math.max(scoreFontSize * Math.min(widthRatio, heightRatio), 20), 60);
     context.font = `${scoreFontSize}px Arial`;
-
-    // Update initial size for next resize
-    initialWidth = newWidth;
-    initialHeight = newHeight;
-    
 });
 
 function drawBall() {
@@ -102,41 +95,54 @@ function updateBall() {
         ball.dy *= -1; // reverse the direction
     }
 
-    // if ball hit the right paddle
+    // if the ball hits the right paddle
     if(collisionDetect(rightPaddle, ball)) {
         ball.dx *= -1; // reverse the direction
         hitSound.play();
     }
 
-    // if ball hit the left paddle
+    // if the ball hits the left paddle
     if(collisionDetect(leftPaddle, ball)) {
         ball.dx *= -1; // reverse the direction
         hitSound.play();
     }
 
-    // if ball goes beyond the right paddle
+    // if the ball goes beyond the right paddle
     if(ball.x + ball.radius > canvas.width) {
         // player on the left wins
         leftScore++;
         scoreSound.play();
         addStars(ball.x, ball.y, 100); // add stars at ball's position
-        ball.x = canvas.width / 2;
-        ball.y = canvas.height / 2;
+        lastScoredSide = 'left'; // left side scored
+        resetBall();
         //addStars(canvas.width / 4, canvas.height / 5, 100); // add stars
     }
 
-    // if ball goes beyond the left paddle
+    // if the ball goes beyond the left paddle
     if(ball.x - ball.radius < 0) {
         // player on the right wins
         rightScore++;
         scoreSound.play();
         addStars(ball.x, ball.y, 100); // add stars at ball's position
-        ball.x = canvas.width / 2;
-        ball.y = canvas.height / 2;
+        lastScoredSide = 'right'; // right side scored
+        resetBall();
         //addStars(3 * canvas.width / 4, canvas.height / 5, 100); // add stars
     }
 }
 
+function resetBall() {
+    ball.x = canvas.width / 2;
+    ball.y = canvas.height / 2;
+    // Generate a random angle between -45 and 45 degrees (converted to radians)
+    let angle = (Math.random() - 0.5) * (Math.PI / 2);
+    // Set the ball's new direction based on the angle and the side that last scored
+    if (lastScoredSide === 'right') {
+        ball.dx = ballSpeed * Math.cos(angle);
+    } else {
+        ball.dx = -ballSpeed * Math.cos(angle);
+    }
+    ball.dy = ballSpeed * Math.sin(angle);
+}
 
 function drawPaddle(x, y, width, height, color) {
     context.fillStyle = color;
@@ -194,6 +200,7 @@ function collisionDetect(paddle, ball) {
         
         // Change direction of ball depending on where it hit the paddle
         ball.dy = dist * 0.05;
+        if (Math.abs(ball.dy) < 1) ball.dy = ball.dy < 0 ? -1 : 1.2; // Ensure minimum speed
         return true;
     }
     return false;
