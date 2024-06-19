@@ -4,7 +4,7 @@ Welcome to pong-ai-test, a modern twist on the classic Pong game, developed with
 
 ## 🎮 How to Play
 
-1. Open the game in your web browser.
+1. Open the game in your web browser by downloading the project and opening the 'index.html' file.
 2. Use the `W` and `S` keys to move the left paddle up and down.
 3. Use the `Up Arrow` and `Down Arrow` keys to move the right paddle up and down.
 4. The goal is to hit the ball with your paddle and send it to your opponent's side. If the ball reaches the edge of your opponent's side, you score a point!
