@@ -1,39 +1,59 @@
 # 🏓 pong-ai-test 🤖
 
-Welcome to pong-ai-test, a modern twist on the classic Pong game, developed with the help of GitHub's AI, CoPilot.
+Welcome to pong-ai-test, a modern twist on the classic Pong game featuring dynamic resizing, sound effects, multiple game modes, and an AI opponent with adjustable difficulty. Initially developed with assistance from GitHub Copilot, this project now showcases a complete gameplay experience.
 
 ## 🎮 How to Play
 
-1. Open the game in your web browser by downloading the project and opening the `index.html` file.
-2. Use the `W` and `S` keys to move the left paddle up and down.
-3. Use the `Up Arrow` and `Down Arrow` keys to move the right paddle up and down.
-4. The goal is to hit the ball with your paddle and send it to your opponent's side. If the ball reaches the edge of your opponent's side, you score a point!
-5. The game ends when a player reaches a score of 10.
+1.  **Open the Game:** Download the project and open the `index.html` file in your web browser.
+2.  **Game Modes:**
+    * Press `M` to switch between **Two-Player** and **Player vs AI** modes. The game will reset when you switch.
+3.  **Controls:**
+    * **Left Paddle (Player 1):** Use `W` (up) and `S` (down) keys. (Always player-controlled).
+    * **Right Paddle (Player 2 / AI):**
+        * In **Two-Player** mode: Use `ArrowUp` (up) and `ArrowDown` (down) keys.
+        * In **Player vs AI** mode: The AI controls this paddle.
+4.  **Gameplay:**
+    * Hit the ball with your paddle to send it to the opponent's side.
+    * Score a point if the ball goes past your opponent's paddle.
+    * The first player to reach **10 points** wins!
+5.  **In-Game Options:**
+    * **Pause/Resume:** Press `P` to pause or resume the game.
+    * **Change AI Difficulty:** In **Player vs AI** mode, press `D` to cycle through difficulty levels: Easy, Medium, Hard, Impossible.
+    * **Restart:** After the game ends ("Game Over"), press `R` to restart in the current mode.
 
 ## 🕹️ Game Mechanics
 
-- The ball speeds up every time it hits a paddle.
-- The direction the ball moves in depends on where it hits the paddle.
-- The game dynamically adjusts to the size of the browser window.
-- The game features a net in the middle of the canvas.
-- The game features a star animation that appears when a player scores a point.
+* **Two Modes:** Play against another human or challenge the AI.
+* **AI Difficulty:** Four levels (Easy, Medium, Hard, Impossible) affect the AI's speed and accuracy.
+* **Scoring:** First to 10 points wins.
+* **Dynamic Resizing:** Game elements adapt fluidly to the browser window size.
+* **Physics:** Ball bounce angle depends on where it hits the paddle.
+* **Visuals & Sound:** Includes a center net, scoring sound effects, paddle hit sounds, and a star animation on score.
+* **Pause/Reset:** Control the game flow with pause and post-game reset options.
 
 ## 💻 Development
 
-This game was developed using JavaScript and the HTML5 Canvas API for rendering. The development process was guided by GitHub's AI, CoPilot, which provided code suggestions and solutions to problems encountered during development.
+This game was developed using JavaScript and the HTML5 Canvas API for rendering. Initial scaffolding and some features were guided by GitHub Copilot suggestions.
 
-The game features include dynamic resizing, collision detection, scoring, sound effects, and (planned) AI-assisted paddle movement. The AI for the paddle will use a simple heuristic: if the ball is above the paddle, it moves up, and if the ball is below the paddle, it moves down.
+Key development aspects include:
+* **Game Loop:** Managed using `requestAnimationFrame`.
+* **State Management:** Tracking game state (`playing`, `paused`, `gameOver`), game mode, scores, and difficulty.
+* **Input Handling:** Detecting key presses for paddle movement and game controls.
+* **Collision Detection:** Calculating ball collisions with paddles and walls.
+* **AI Logic:** The AI uses a reactive strategy (tracking the ball's Y position) modified by the selected difficulty level through speed scaling and random error margins.
+* **Dynamic Scaling:** Adjusting element sizes, positions, and speeds on window resize.
 
 ## 🚀 Future Plans
 
-- Add a start/pause button to control the game flow.
-- Add a reset button to restart the game.
-- Add an option to play against an AI opponent.
-- Add different difficulty levels for the AI opponent.
-- Add more sound effects for different game events.
+While the core game is complete, potential future enhancements include:
+* Adding a visual start/menu screen.
+* Implementing a Start button instead of auto-start.
+* Exploring more advanced AI techniques (e.g., prediction).
+* Adding more sound effects or visual polish.
+* Optional gameplay variations (e.g., ball speed increasing over time).
 
 ## 🎉 Acknowledgements
 
-A big thank you to GitHub's CoPilot for assisting in the development of this game!
+A big thank you to GitHub Copilot for assisting in the initial development stages of this game!
 
 Enjoy playing pong-ai-test! 🎉
