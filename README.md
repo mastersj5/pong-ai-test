@@ -4,7 +4,7 @@ Welcome to pong-ai-test, a modern twist on the classic Pong game featuring dynam
 
 ## 🎮 How to Play
 
-1.  **Open the Game:** Download the project and open the `index.html` file in your web browser.
+1.  **Open the Game:** Download the project and open the `index.html` file in your web browser or navigate to [my portfolio page](https://mastersj5.github.io/projects/2_project/) to play it in-browser.
 2.  **Game Modes:**
     * Press `M` to switch between **Two-Player** and **Player vs AI** modes. The game will reset when you switch.
 3.  **Controls:**
